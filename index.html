@@ -6,10 +6,46 @@
   <title>Super Mario</title>
   <link rel="stylesheet" href="style.css">
   <link rel="shortcut icon" href="image.png" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Martel+Sans:wght@200;300;400;600;700;800;900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
+<div id="modal" class="modal">
+  <div class="button-container">
+    <button id="register-button">Register</button>
+    <button id="login-button" class="not-active">Login</button>
+  </div>
 
-  
+  <!--Register-Form  -->
+  <form onsubmit="" action="" id="register-form">
+    <label for="register-email">Email</label>
+    <input type="email" id="register-email" placeholder="demo@example.com" required>
+    <label for="register-password">Password</label>
+    <input type="password" id="register-password" required>
+    <label for="register-username">Username</label>
+    <input id="register-username" placeholder="User" required>
+    <br>
+    <input type="submit" value="Sign Up">
+  </form>
+
+<!-- Login Form -->
+   <form onsubmit="" action="" id="login-form" class="hidden">
+    <label for="login-email">Email</label>
+    <input type="email" id="login-email" placeholder="demo@example.com" required>
+    <label for="login-password">Password</label>
+    <input type="password" id="login-password" required>
+    <br>
+    <input type="submit" value="Sign In">
+  </form>
+</div>
+
+<div class="info-container">
+  <button id="logout-button" class="hidden">Log Out</button>
+  <h3 id="username"></h3>
+  <h3 id="highscore-tag" class="hidden">HighScore : <span id="highscore"></span></h3>
+</div>
+
   <script src="script.js"></script>
 </body>
 </html>
