@@ -1,0 +1,21 @@
+:root{ --bg:#73c8ff; --card:#ffffff; --accent:#ffcc00; }
+*{box-sizing:border-box}
+html,body,#app{height:100%;margin:0;font-family:Inter,system-ui,Arial}
+body{background:linear-gradient(180deg,var(--bg),#8ad1ff);display:flex;align-items:center;justify-content:center}
+.card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.12);width:min(880px,95%)}
+#auth{max-width:560px;text-align:center}
+input{display:block;width:100%;padding:10px;margin:8px 0;border-radius:6px;border:1px solid #ddd}
+button{padding:10px 14px;border-radius:8px;border:none;background:var(--accent);cursor:pointer}
+.hidden{display:none}
+#game-screen{width:100%;max-width:1200px}
+#game-container{background:linear-gradient(#87ceeb,#fff);border-radius:10px;overflow:hidden}
+#game{width:100%;height:auto;display:block}
+#topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+#hud span{margin-right:12px;font-weight:700}
+#overlay{position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center}
+#overlay-card{background:#fff;padding:20px;border-radius:10px;text-align:center}
+
+
+/* Responsive canvas container height adjustments */
+#game-container{height:56vh;min-height:280px}
+@media (max-width:600px){#game-container{height:48vh}}
