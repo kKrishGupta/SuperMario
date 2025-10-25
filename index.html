@@ -3,311 +3,214 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Super Mario — Responsive Prototype (HTML + CSS)</title>
+  <title>Super Mario - Prototype</title>
   <style>
-    /* ---------------------------
-       Global & Reset
-       --------------------------- */
-    :root{
-      --bg-gradient-1: linear-gradient(180deg,#87ceeb 0%, #66b3ff 50%, #9be2ff 100%);
-      --ground: #6b3; /* placeholder */
-      --ui-bg: rgba(255,255,255,0.85);
-      --accent: #e74c3c;
-      --max-width: 1200px;
-      --safe-padding: 16px;
-      --game-aspect: calc(16/9);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial}
-    img{max-width:100%;display:block}
-
-    /* ---------------------------
-       Layout
-       --------------------------- */
-    .app{
-      min-height:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:var(--safe-padding);
-      background: var(--bg-gradient-1);
-    }
-
-    .container{
-      width:100%;
-      max-width:var(--max-width);
-      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-      border-radius:12px;
-      box-shadow: 0 10px 30px rgba(10,10,20,0.12);
-      overflow:hidden;
-      display:grid;
-      grid-template-columns: 420px 1fr;
-      gap:0;
-    }
-
-    /* Left panel: auth / menu */
-    .panel{padding:24px;background:linear-gradient(180deg, rgba(255,255,255,0.65), rgba(255,255,255,0.6));}
-    .brand{display:flex;gap:12px;align-items:center;margin-bottom:8px}
-    .brand .logo{width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,#ffca28,#ffc107);display:flex;align-items:center;justify-content:center;font-weight:800}
-    .brand h1{font-size:20px;margin:0}
-    .lead{color:#333;font-size:13px;margin-top:6px}
-
-    .auth-card{margin-top:18px;background:var(--ui-bg);padding:16px;border-radius:10px}
-    .auth-card h2{margin:0 0 8px 0;font-size:16px}
-    .form-row{margin-bottom:10px}
-    .form-row label{display:block;font-size:13px;color:#333;margin-bottom:6px}
-    .form-row input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.08);font-size:14px}
-    .btn{display:inline-block;padding:10px 14px;border-radius:8px;border:none;background:var(--accent);color:white;font-weight:600;cursor:pointer}
-    .muted{font-size:12px;color:#666}
-    .link{color:var(--accent);cursor:pointer}
-
-    /* Right panel: game viewport */
-    .game-wrap{position:relative;background:transparent;display:flex;flex-direction:column}
-
-    /* top bar within game */
-    .game-top{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:transparent}
-    .status{display:flex;gap:12px;align-items:center}
-    .chip{background:rgba(255,255,255,0.9);padding:8px 10px;border-radius:999px;font-weight:600;box-shadow:0 6px 14px rgba(10,10,40,0.06)}
-
-    /* viewport container keeps aspect ratio and is responsive */
-    .viewport-outer{flex:1;padding:18px;display:flex;align-items:center;justify-content:center}
-
-    .viewport{
-      width:100%;
-      max-width:100%;
-      background:linear-gradient(180deg,#9be2ff 0%, #5ec0ff 60%);
-      border-radius:10px;
-      position:relative;
-      overflow:hidden;
-      /* Maintain an approximate 16:9 game area but allow responsive scaling */
-      aspect-ratio: 16 / 9;
-      box-shadow: 0 8px 30px rgba(10,10,30,0.12);
-      border: 8px solid rgba(0,0,0,0.06);
-    }
-
-    /* Game world layers */
-    .world{position:absolute;inset:0;pointer-events:none}
-    .sky{position:absolute;inset:0;background:transparent}
-    .ground{
-      position:absolute;left:0;right:0;bottom:0;height:18%;
-      background:linear-gradient(180deg,#2f7f2f,#2b6f2b);
-      border-top:6px solid rgba(0,0,0,0.08);
-      z-index:10;
-      display:flex;align-items:flex-end;padding-left:6%;
-    }
-
-    /* simple grid to position platforms & obstacles (JS will manipulate these) */
-    .stage{position:absolute;left:0;right:0;bottom:18%;top:0;z-index:8}
-
-    /* Player (placeholder sprite using CSS) */
-    .player{
-      --w:48px; --h:64px;
-      position:absolute;left:10%;bottom:18%;width:var(--w);height:var(--h);
-      transform-origin:center bottom;
-      background-image:linear-gradient(180deg,#ff6b6b,#c0392b);
-      border-radius:6px;
-      box-shadow:0 6px 10px rgba(0,0,0,0.25);
-      pointer-events:auto;
-    }
-
-    /* Enemy / Obstacle placeholder */
-    .enemy{position:absolute;width:44px;height:44px;border-radius:6px;background:linear-gradient(180deg,#333,#111);bottom:18%}
-
-    /* UI overlay (score, lives) */
-    .ui-overlay{position:absolute;left:12px;top:12px;z-index:20;display:flex;gap:8px}
-
-    .levels-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.level-btn {
-  flex: 1 0 21%; /* 4 per row on large screens */
-  min-width: 80px;
-  padding: 14px 0;
-  background: #3498db;
-  color: white;
-  text-align: center;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.2s;
-}
-
-.level-btn.locked {
-  background: #ccc;
-  cursor: not-allowed;
-  color: #666;
-}
-
-.level-btn:hover:not(.locked) {
-  background: #2980b9;
-}
-
-@media(max-width:800px){
-  .level-btn{flex:1 0 46%; min-width:60px;} /* 2 per row */
-}
-
-@media(max-width:500px){
-  .level-btn{flex:1 0 90%;} /* 1 per row */
-}
-
-
-    /* Mobile controls (visible only on small screens) */
-    .mobile-controls{position:absolute;left:12px;right:12px;bottom:12px;display:none;gap:12px;z-index:30;pointer-events:auto}
-    .control{flex:1;background:rgba(255,255,255,0.65);padding:12px;border-radius:10px;text-align:center;font-weight:700;user-select:none}
-
-    /* Levels list (collapsed) */
-    .levels{position:absolute;right:12px;top:12px;z-index:20;background:rgba(255,255,255,0.9);padding:8px;border-radius:10px}
-
-    /* responsive tweaks */
-    @media (max-width:1000px){
-      .container{grid-template-columns:1fr}
-      .panel{order:2}
-      .game-wrap{order:1}
-    }
-    @media (max-width:640px){
-      .panel{padding:14px}
-      .auth-card{padding:12px}
-      .viewport{aspect-ratio: 4/3}
-      .mobile-controls{display:flex}
-      .player{--w:36px;--h:48px}
-    }
-
-    /* Accessibility and small polish */
-    button:focus,input:focus{outline:3px solid rgba(255,200,200,0.45)}
-
-    /* Hints / placeholders (non-functional visual details) */
-    .hint{font-size:12px;color:#444;margin-top:8px}
-
-    /* small breakpoint for very small screens */
-    @media (max-width:420px){
-      .container{border-radius:0}
-      .brand h1{font-size:16px}
-      .chip{padding:6px 8px;font-size:13px}
-    }
-
+    /* (style unchanged from your original file; kept as-is) */
+    :root{ --bg-sky: linear-gradient(#79c0ff, #7ed957 60%, #6bbf43 100%); --panel: rgba(255,255,255,0.06); --accent: #ffcc00; --danger: #d9534f; --glass: rgba(255,255,255,0.06); --glass-2: rgba(0,0,0,0.45); --card-radius: 14px; --max-width: 1200px; --transition: 200ms ease; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
+    html,body{height:100%;margin:0;background:var(--bg-sky);}
+    .app{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+    .container{width:100%;max-width:var(--max-width);background:transparent;display:grid;grid-template-columns:1fr;gap:20px;}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.18));border-radius:var(--card-radius);box-shadow:0 10px 30px rgba(2,6,23,0.35);padding:18px;backdrop-filter: blur(6px);}
+    header{display:flex;align-items:center;justify-content:space-between;padding:8px 4px;color:#fff}
+    header .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:48px;height:48px;background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_9YigO60jrEjw2GEoTepK8751qvRcVkJrRQ&s') center/cover no-repeat;border-radius:10px}
+    .brand h1{font-size:18px;margin:0}
+    .auth-wrap{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+    .auth-form{flex:1;min-width:260px;max-width:420px;padding:16px;border-radius:12px;background:var(--glass-2);color:#fff}
+    .auth-form h2{margin:0 0 8px}
+    .auth-form label{display:block;font-size:13px;margin-top:10px}
+    .auth-form input{width:100%;padding:10px;border-radius:8px;border:0;margin-top:6px;background:rgba(255,255,255,0.03);color:#fff}
+    .btn{display:inline-block;padding:10px 14px;border-radius:10px;border:0;cursor:pointer;background:linear-gradient(90deg,#ff8c00,#ffcc00);color:#111;font-weight:600;margin-top:12px}
+    .link{background:none;border:0;color:var(--accent);cursor:pointer;margin-left:6px}
+    .muted{color:#cfe8ff;font-size:13px;opacity:0.85}
+    .levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:12px;margin-top:6px}
+    .level-card{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.2));color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+    .level-num{font-size:18px;font-weight:700}
+    .level-title{font-size:12px;margin-top:6px}
+    .locked::after{content:"LOCKED";position:absolute;inset:auto 8px 8px 8px;background:rgba(0,0,0,0.45);padding:4px 6px;border-radius:6px;font-size:11px}
+    .unlocked{box-shadow:0 6px 18px rgba(0,0,0,0.3)}
+    .level-card.active{outline:3px solid rgba(255,204,0,0.12)}
+    .game-screen{display:none;flex-direction:column;height:78vh;border-radius:12px;overflow:hidden;position:relative}
+    .game-top{display:flex;justify-content:space-between;padding:12px;background:linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.12));color:#fff;align-items:center}
+    .hud{display:flex;gap:14px;align-items:center}
+    .hud .box{background:rgba(0,0,0,0.25);padding:8px 12px;border-radius:10px}
+    .game-canvas-wrap{flex:1;position:relative;display:flex;align-items:flex-end;justify-content:center;background-image: url('https://via.placeholder.com/1600x900.png?text=Parallax+Background');background-size:cover;background-position:center}
+    #gameCanvas{width:100%;height:100%;display:block}
+    .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+    .modal{pointer-events:auto;background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(0,0,0,0.5));padding:18px;border-radius:12px;color:#fff;min-width:260px;text-align:center}
+    .modal h3{margin:0 0 6px}
+    .modal p{margin:6px 0}
+    .modal .small{font-size:13px;color:#cfe8ff}
+    .sprite{width:48px;height:48px;background:transparent;display:inline-block}
+    .coin{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 30% 30%, #fff6c6, #ffda44);display:inline-block}
+    #transitionOverlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); color: #fff; font-family: 'Press Start 2P', monospace; font-size: 2rem; display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 1s ease; z-index: 9999; }
+    #transitionOverlay.show { opacity: 1; } #transitionOverlay.fadeout { opacity: 0; } .hidden { display: none; }
+    #leaderboardContainer { background: rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 8px; max-width: 300px; margin: 10px auto; } #leaderboardList { list-style: none; padding: 0; font-family: monospace; } #leaderboardList li { margin: 5px 0; display: flex; justify-content: space-between; }
+    @media (max-width:720px){ .game-screen{height:68vh} .auth-wrap{flex-direction:column} .auth-form{max-width:100%} header .brand h1{font-size:16px} }
+    @media (max-width:420px){ :root{--card-radius:10px} .levels{grid-template-columns:repeat(5,1fr)} .level-card{padding:8px} }
+    .btn:active{transform:translateY(1px)} .pulse{animation:pulse 1200ms infinite} @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+    button:focus, input:focus{outline:3px solid rgba(255,204,0,0.12)}
+    #mobileControls { position: fixed; bottom: 20px; width: 100%; display: flex; justify-content: space-around; pointer-events: auto; } #mobileControls button { width: 60px; height: 60px; border-radius: 50%; border: none; background: rgba(255,255,255,0.5); font-size: 24px; } @media (min-width: 768px){ #mobileControls{ display:none; } }
   </style>
 </head>
 <body>
   <div class="app">
-    <div class="container" role="application">
+    <div class="container">
 
-      <!-- LEFT PANEL: AUTH / MENU -->
-      <aside class="panel" aria-label="Sidebar">
+      <!-- Header -->
+      <header class="card">
         <div class="brand">
-          <div class="logo">SM</div>
+          <div class="logo" aria-hidden></div>
           <div>
             <h1>Super Mario — Prototype</h1>
-            <div class="lead">Responsive HTML + CSS base — JS step-by-step will follow.</div>
+            <div class="muted">10 levels • Responsive • LocalStorage auth (JS required)</div>
           </div>
         </div>
+        <div>
+          <button id="btn-logout" class="btn hidden">Logout</button>
+        </div>
+      </header>
 
-        <div class="auth-card" id="authCard">
-          <h2 id="authTitle">Login</h2>
-
-          <!-- NOTE: We intentionally don't include JS behavior here. JS will attach to these IDs. -->
-          <form id="authForm" onsubmit="return false;">
-            <div class="form-row">
-              <label for="username">Username</label>
-              <input id="username" name="username" placeholder="Choose username" autocomplete="username" />
+      <!-- Auth + Level selection card -->
+      <section class="card">
+        <div id="authArea" class="auth-wrap">
+          <!-- Login Form -->
+          <form id="loginForm" class="auth-form" autocomplete="off">
+            <h2>Login</h2>
+            <label for="login-email">Email</label>
+            <input id="login-email" type="email" required placeholder="you@example.com" />
+            <label for="login-pass">Password</label>
+            <input id="login-pass" type="password" required placeholder="••••••••" />
+            <div style="display:flex;align-items:center;gap:10px;">
+              <button class="btn" id="loginBtn" type="button">Login</button>
+              <button type="button" class="link" id="showRegister">Create account</button>
             </div>
-            <div class="form-row" id="emailRow">
-              <label for="email">Email</label>
-              <input id="email" name="email" type="email" placeholder="you@example.com" />
-            </div>
-            <div class="form-row">
-              <label for="password">Password</label>
-              <input id="password" name="password" type="password" placeholder="••••••••" />
-            </div>
-
-            <div style="display:flex;gap:8px;align-items:center;margin-top:10px">
-              <button class="btn" id="authPrimary">Login</button>
-              <div class="muted">or</div>
-              <div class="link" id="toggleAuth">Create account</div>
-            </div>
-
-            <div class="hint">All data will be stored locally in your browser (localStorage) — JS will handle sign-up and login logic.</div>
+            <div class="muted" style="margin-top:10px">Note: Accounts are stored in localStorage for this prototype.</div>
           </form>
-        </div>
 
-        <div style="margin-top:14px">
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <div class="chip">10 Levels</div>
-            <div class="chip">Responsive</div>
-            <div class="chip">Keyboard + Touch</div>
-          </div>
-        </div>
+          <!-- Register Form -->
+          <form id="registerForm" class="auth-form hidden" autocomplete="off">
+            <h2>Create account</h2>
+            <label for="reg-name">Player name</label>
+            <input id="reg-name" type="text" required placeholder="Your nickname" />
+            <label for="reg-email">Email</label>
+            <input id="reg-email" type="email" required placeholder="you@example.com" />
+            <label for="reg-pass">Password</label>
+            <input id="reg-pass" type="password" required placeholder="Pick a strong password" />
+            <div style="display:flex;align-items:center;gap:10px;">
+              <button class="btn" id="registerBtn" type="button">Register</button>
+              <button type="button" class="link" id="showLogin">Back to login</button>
+            </div>
+          </form>
 
-        <div style="margin-top:18px;font-size:13px;color:#333">
-          <strong>Instructions</strong>
-          <p class="muted" style="margin-top:8px">This file contains complete responsive HTML & CSS. I will provide the JavaScript engine step‑by‑step next: physics, controls, rendering, collision, enemies, level loading and persistence. The HTML includes IDs that the JS will use: <code>authForm</code>, <code>username</code>, <code>email</code>, <code>password</code>, <code>authPrimary</code>, <code>toggleAuth</code>, and the game DOM: <code>viewport</code>, <code>stage</code>, <code>player</code>.</p>
-        </div>
-
-      </aside>
-
-      <!-- RIGHT PANEL: GAME VIEWPORT -->
-      <main class="game-wrap">
-        <div class="game-top">
-          <div class="status">
-            <div class="chip" id="scoreChip">Score: 0</div>
-            <div class="chip" id="livesChip">Lives: 3</div>
-            <div class="chip" id="levelChip">Level: 1</div>
-          </div>
-          <div style="display:flex;gap:10px;align-items:center">
-            <button class="btn" id="startBtn">Start</button>
-            <button class="btn" id="pauseBtn" style="background:#444">Pause</button>
-          </div>
-        </div>
-
-        <div class="viewport-outer">
-          <div class="viewport" id="viewport" aria-label="Game viewport" role="region">
-
-            <!-- world layers -->
-            <div class="world" id="world">
-              <div class="sky"></div>
-              <div class="stage" id="stage">
-                <!-- Example static elements (JS will reposition / clone / animate) -->
-                <div class="player" id="player" style="left:8%;bottom:18%;"></div>
-                <div class="enemy" style="left:50%;bottom:18%;"></div>
-              </div>
-              <div class="ground"></div>
-
-              <!-- UI overlay inside viewport -->
-              <div class="ui-overlay" aria-hidden="true">
-                <div class="chip">Time: <span id="timeLeft">300</span></div>
-              </div>
-
-              <!-- levels quick list -->
-              <div class="levels" id="levels">
-                <div style="font-weight:700;margin-bottom:6px">Levels</div>
-                <div style="display:flex;gap:6px;flex-wrap:wrap">
-                  <!-- JS will generate 10 level buttons here -->
-                </div>
-              </div>
-
-                <div id="levelScreen" style="display:none;">
-                <h2>Select Level</h2>
-                <div id="levelsContainer" class="levels-container"></div>
-              </div>
-                          <!-- mobile controls -->
-              <div class="mobile-controls" id="mobileControls">
-                <div class="control" id="leftBtn">◀</div>
-                <div class="control" id="jumpBtn">▲ Jump</div>
-                <div class="control" id="rightBtn">▶</div>
-              </div>
-
+          <!-- Level selection (shown after login via JS) -->
+          <div id="levelsArea" class="card hidden" style="flex:1;min-width:260px;">
+            <h2 style="margin-top:0;color:#fff">Choose Level</h2>
+            <div class="levels" id="levelsGrid">
+              <!-- 10 level cards -->
+              <div class="level-card unlocked" data-level="1"><div class="level-num">1</div><div class="level-title">Beginner Meadow</div></div>
+              <div class="level-card locked" data-level="2"><div class="level-num">2</div><div class="level-title">Underground Pipes</div></div>
+              <div class="level-card locked" data-level="3"><div class="level-num">3</div><div class="level-title">Forest Run</div></div>
+              <div class="level-card locked" data-level="4"><div class="level-num">4</div><div class="level-title">Lava Bridge</div></div>
+              <div class="level-card locked" data-level="5"><div class="level-num">5</div><div class="level-title">Sky Islands</div></div>
+              <div class="level-card locked" data-level="6"><div class="level-num">6</div><div class="level-title">Castle Gate</div></div>
+              <div class="level-card locked" data-level="7"><div class="level-num">7</div><div class="level-title">Ice Cavern</div></div>
+              <div class="level-card locked" data-level="8"><div class="level-num">8</div><div class="level-title">Haunted Hall</div></div>
+              <div class="level-card locked" data-level="9"><div class="level-num">9</div><div class="level-title">Bowser's Keep</div></div>
+              <div class="level-card locked" data-level="10"><div class="level-num">10</div><div class="level-title">Final Showdown</div></div>
             </div>
 
+            <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+              <div class="muted">Progress: <span id="progressText">Level 1 unlocked</span></div>
+              <div>
+                <button class="btn" id="btn-reset">Reset Progress</button>
+              </div>
+            </div>
           </div>
+
+        </div>
+      </section>
+
+      <!-- mobile controls + total coins -->
+      <div id="mobileControls">
+        <button id="btnLeft">◀</button>
+        <button id="btnRight">▶</button>
+        <button id="btnJump">⤒</button>
+        <button id="btnFire">🔥</button>
+      </div>
+
+      <p id="totalCoins" style="color:#fff;margin:0;">0</p>
+
+      <!-- Game screen -->
+      <section id="gameSection" class="card game-screen">
+        <div class="game-top">
+          <div class="hud">
+            <div class="box">Player: <strong id="playerName">-</strong></div>
+            <div class="box">Score: <strong id="score">0</strong></div>
+            <div class="box">Coins: <strong id="coins">0</strong></div>
+            <div class="box">Lives: <strong id="lives">3</strong></div>
+          </div>
+          <div><button class="btn" id="btn-exit">Exit Level</button></div>
         </div>
 
-      </main>
+        <div class="game-canvas-wrap" id="gameCanvasWrap">
+          <canvas id="gameCanvas" width="1280" height="720" aria-label="Game canvas"></canvas>
+
+          <!-- overlay for messages -->
+          <div class="overlay" id="overlay">
+            <div class="modal hidden" id="modalWin">
+              <h3>You Win!</h3>
+              <p>Coins collected: <strong id="winCoins">0</strong></p>
+              <p class="small">Score: <strong id="winScore">0</strong></p>
+              <div style="margin-top:8px">
+                <button class="btn" id="nextLevelBtn">Next Level</button>
+                <button class="btn" id="replayLevelBtn">Replay</button>
+              </div>
+            </div>
+
+            <div class="modal hidden" id="modalFail">
+              <h3>Game Over</h3>
+              <p class="small">Try again — you can do it!</p>
+              <div style="margin-top:8px">
+                <button class="btn" id="retryBtn">Retry</button>
+                <button class="btn" id="exitBtn">Exit</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <footer class="card" style="display:flex;justify-content:space-between;align-items:center">
+        <div class="muted">Controls: Arrow keys to move, Z to jump, X to run/attack (configurable in JS)</div>
+        <div class="muted">Prototype by you — JS will add physics, enemies, collisions.</div>
+      </footer>
 
     </div>
   </div>
-  <script src="script.js"></script>
+
+  <!-- Level Transition Overlay -->
+  <div id="transitionOverlay" class="hidden"><div id="transitionText"></div></div>
+
+  <!-- Leaderboard (client-side placeholder) -->
+  <div id="leaderboardContainer">
+    <h3>🏆 Top Players</h3>
+    <select id="levelSelectLB">
+      <option value="1">Level 1</option>
+      <option value="2">Level 2</option>
+      <option value="3">Level 3</option>
+      <option value="4">Level 4</option>
+      <option value="5">Level 5</option>
+      <option value="6">Level 6</option>
+      <option value="7">Level 7</option>
+      <option value="8">Level 8</option>
+      <option value="9">Level 9</option>
+      <option value="10">Level 10</option>
+    </select>
+    <ul id="leaderboardList"></ul>
+  </div>
+
+  <!-- load main JS as module -->
+  <script type="module" src="script.js"></script>
 </body>
 </html>

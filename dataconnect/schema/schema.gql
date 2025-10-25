@@ -1,0 +1,44 @@
+type Player @table {
+  username: String!
+  createdAt: Timestamp!
+  email: String
+  displayName: String
+  avatarUrl: String
+}
+
+type GameSession @table {
+  startTime: Timestamp!
+  status: String!
+  createdAt: Timestamp!
+  endTime: Timestamp
+  location: String
+  notes: String
+}
+
+type PlayerSession @table(key: ["player", "gameSession"]) {
+  player: Player!
+  gameSession: GameSession!
+  score: Int!
+  position: Int!
+  createdAt: Timestamp!
+  finalStatus: String
+}
+
+type Move @table {
+  gameSession: GameSession!
+  player: Player
+  timestamp: Timestamp!
+  description: String!
+  moveType: String!
+  createdAt: Timestamp!
+  details: String
+}
+
+type Event @table {
+  name: String!
+  startDate: Date!
+  createdAt: Timestamp!
+  endDate: Date
+  description: String
+  location: String
+}
